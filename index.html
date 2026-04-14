@@ -270,8 +270,8 @@
         <div class="header-content">
             <div class="case-title">Demanda Ejecutiva - Proceso Ejecutivo de Mayor Cuantía</div>
             <div class="case-subtitle">
-                <strong>DEMANDANTE:</strong> Star Land S.A.S. (NIT: 806.015.201-3)<br>
-                <strong>DEMANDADO:</strong> Fiberhome Telecommunication Technologies Co Ltd (NIT: 901.543.211-6)
+                <strong>DEMANDANTE:</strong> Star Land S.A.S. (NIT: 901.477.437-0)<br>
+                <strong>DEMANDADO:</strong> Fiberhome Telecommunication Technologies Co Ltd (NIT: 900.756.412-0)
             </div>
             <div class="case-metadata">
                 <div class="metadata-item">
@@ -332,7 +332,7 @@
     </div>
 
     <div class="footer">
-        <p>© 2026 Centro de Facturas Judicial | Caso NIT Demandante: 806.015.201-3 | NIT Demandado: 901.543.211-6</p>
+        <p>© 2026 Centro de Facturas Judicial | Caso NIT Demandante: 901.477.437-0 | NIT Demandado: 900.756.412-0</p>
     </div>
 
     <script>
@@ -499,7 +499,8 @@
                 factura.num.toString().includes(term) ||
                 factura.fecha.includes(term) ||
                 factura.vencimiento.includes(term) ||
-                formatCurrency(factura.valor).toLowerCase().includes(term)
+                factura.valor.toString().includes(term) ||
+                factura.intereses.toString().includes(term)
             );
 
             renderTable(filtered);
