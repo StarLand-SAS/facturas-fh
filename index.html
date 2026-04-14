@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centro de Facturas - Caso Judicial</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1f2937 100%);
+            color: white;
+            padding: 40px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .case-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .case-subtitle {
+            font-size: 0.95em;
+            opacity: 0.85;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .case-metadata {
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .metadata-item {
+            background: rgba(255,255,255,0.05);
+            padding: 10px 15px;
+            border-radius: 6px;
+            border-left: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .metadata-label {
+            opacity: 0.7;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metadata-value {
+            font-weight: 600;
+            margin-top: 3px;
+        }
+
+        .case-stats {
+            display: none;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.1);
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .results-info {
+            padding: 10px 20px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .table-wrapper {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f3f4f6;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+            color: #374151;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.95em;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .factura-num {
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+
+        .valor {
+            color: #059669;
+            font-weight: 600;
+        }
+
+        .download-cell {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .download-btn {
+            background: #3b82f6;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.8em;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .download-btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .file-label {
+            font-size: 0.7em;
+            color: #fff;
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            font-weight: 500;
+            word-break: break-word;
+            max-width: 120px;
+            line-height: 1.2;
+        }
+
+        .loading {
+            font-size: 0.8em;
+            color: #999;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #9ca3af;
+        }
+
+        .footer {
+            background: #1f2937;
+            color: #9ca3af;
+            padding: 20px;
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .case-title {
+                font-size: 1.3em;
+            }
+
+            .case-metadata {
+                grid-template-columns: 1fr;
+            }
+
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.85em;
+            }
+
+            .download-btn {
+                padding: 6px 10px;
+                font-size: 0.75em;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="case-title">Demanda Ejecutiva - Proceso Ejecutivo de Mayor Cuantía</div>
+            <div class="case-subtitle">
+                <strong>DEMANDANTE:</strong> Star Land S.A.S. (NIT: 806.015.201-3)<br>
+                <strong>DEMANDADO:</strong> Fiberhome Telecommunication Technologies Co Ltd (NIT: 901.543.211-6)
+            </div>
+            <div class="case-metadata">
+                <div class="metadata-item">
+                    <div class="metadata-label">Capital Demandado</div>
+                    <div class="metadata-value">$805,953,912.95</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">Intereses Demandados</div>
+                    <div class="metadata-value">$92,834,000.00</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">Total Demanda</div>
+                    <div class="metadata-value">$898,787,912.95</div>
+                </div>
+                <div class="metadata-item">
+                    <div class="metadata-label">Facturas en Controversia</div>
+                    <div class="metadata-value" id="total-facturas">53 Facturas</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="search-box">
+            <input 
+                type="text" 
+                id="searchInput" 
+                class="search-input" 
+                placeholder="Buscar por número de factura, fecha o valor..."
+            >
+        </div>
+
+        <div class="results-info">
+            <span id="resultsCount">Mostrando 54 facturas</span>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="facturasTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Factura</th>
+                        <th>Fecha Factura</th>
+                        <th>Fecha Vencimiento</th>
+                        <th>Valor Capital</th>
+                        <th>Intereses</th>
+                        <th>Días Vencida</th>
+                        <th>Descargar</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+            <div id="noResults" class="no-results hidden">
+                No se encontraron facturas que coincidan con tu búsqueda
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>© 2026 Centro de Facturas Judicial | Caso NIT Demandante: 806.015.201-3 | NIT Demandado: 901.543.211-6</p>
+    </div>
+
+    <script>
+        const facturas = [
+            {num: 954, fecha: '14/08/2024', vencimiento: '13/09/2024', valor: 445500, intereses: 166000, dias: 575},
+            {num: 1040, fecha: '20/10/2024', vencimiento: '19/11/2024', valor: 396000, intereses: 130000, dias: 508},
+            {num: 1042, fecha: '20/10/2024', vencimiento: '19/11/2024', valor: 2168100, intereses: 703000, dias: 508},
+            {num: 1061, fecha: '22/10/2024', vencimiento: '21/11/2024', valor: 8550000, intereses: 2763000, dias: 506},
+            {num: 1063, fecha: '22/10/2024', vencimiento: '21/11/2024', valor: 396000, intereses: 130000, dias: 506},
+            {num: 993, fecha: '16/09/2024', vencimiento: '16/10/2024', valor: 11551800, intereses: 4031000, dias: 542},
+            {num: 1055, fecha: '22/10/2024', vencimiento: '21/11/2024', valor: 792000, intereses: 254000, dias: 506},
+            {num: 1056, fecha: '22/10/2024', vencimiento: '21/11/2024', valor: 2977200, intereses: 964000, dias: 506},
+            {num: 1071, fecha: '28/10/2024', vencimiento: '27/11/2024', valor: 1485000, intereses: 474000, dias: 500},
+            {num: 1073, fecha: '28/10/2024', vencimiento: '27/11/2024', valor: 1762500, intereses: 560000, dias: 500},
+            {num: 1368, fecha: '25/04/2025', vencimiento: '25/05/2025', valor: 3037500, intereses: 617000, dias: 321},
+            {num: 1370, fecha: '25/04/2025', vencimiento: '25/05/2025', valor: 5532750, intereses: 1124000, dias: 321},
+            {num: 1397, fecha: '13/05/2025', vencimiento: '12/06/2025', valor: 21723900, intereses: 4153000, dias: 303},
+            {num: 1398, fecha: '13/05/2025', vencimiento: '12/06/2025', valor: 14256000, intereses: 2728000, dias: 303},
+            {num: 1399, fecha: '13/05/2025', vencimiento: '12/06/2025', valor: 198000, intereses: 39000, dias: 303},
+            {num: 1400, fecha: '13/05/2025', vencimiento: '12/06/2025', valor: 16212000, intereses: 3101000, dias: 303},
+            {num: 1489, fecha: '02/07/2025', vencimiento: '01/08/2025', valor: 11191500, intereses: 1787000, dias: 253},
+            {num: 1500, fecha: '03/07/2025', vencimiento: '02/08/2025', valor: 24338250, intereses: 3868000, dias: 252},
+            {num: 1505, fecha: '04/07/2025', vencimiento: '03/08/2025', valor: 14587200, intereses: 2310000, dias: 251},
+            {num: 1508, fecha: '04/07/2025', vencimiento: '03/08/2025', valor: 2376000, intereses: 375000, dias: 251},
+            {num: 1513, fecha: '04/07/2025', vencimiento: '03/08/2025', valor: 2178000, intereses: 345000, dias: 251},
+            {num: 1524, fecha: '07/07/2025', vencimiento: '06/08/2025', valor: 21708900, intereses: 3395000, dias: 248},
+            {num: 1531, fecha: '08/07/2025', vencimiento: '08/07/2025', valor: 49713750, intereses: 7744000, dias: 247},
+            {num: 1621, fecha: '12/09/2025', vencimiento: '11/10/2025', valor: 42714000, intereses: 4880000, dias: 181},
+            {num: 1637, fecha: '13/09/2025', vencimiento: '12/10/2025', valor: 45464400, intereses: 5166000, dias: 180},
+            {num: 1649, fecha: '15/09/2025', vencimiento: '13/10/2025', valor: 18810000, intereses: 2115000, dias: 178},
+            {num: 1650, fecha: '15/09/2025', vencimiento: '15/10/2025', valor: 7326000, intereses: 823000, dias: 178},
+            {num: 1651, fecha: '15/09/2025', vencimiento: '15/10/2025', valor: 5215500, intereses: 586000, dias: 178},
+            {num: 1652, fecha: '15/09/2025', vencimiento: '15/10/2025', valor: 21723900, intereses: 2442000, dias: 178},
+            {num: 1653, fecha: '15/09/2025', vencimiento: '15/10/2025', valor: 198000, intereses: 23000, dias: 178},
+            {num: 1654, fecha: '15/09/2025', vencimiento: '15/10/2025', valor: 2277000, intereses: 256000, dias: 178},
+            {num: 1670, fecha: '25/09/2025', vencimiento: '15/10/2025', valor: 965250, intereses: 103000, dias: 169},
+            {num: 1671, fecha: '25/09/2025', vencimiento: '24/10/2025', valor: 5248600, intereses: 563000, dias: 169},
+            {num: 1677, fecha: '25/09/2025', vencimiento: '24/10/2025', valor: 28696950, intereses: 3050000, dias: 168},
+            {num: 1712, fecha: '25/10/2025', vencimiento: '25/10/2025', valor: 40122930.75, intereses: 3511000, dias: 138},
+            {num: 1713, fecha: '25/10/2025', vencimiento: '24/11/2025', valor: 40122394.85, intereses: 3511000, dias: 138},
+            {num: 1714, fecha: '25/10/2025', vencimiento: '24/11/2025', valor: 40122394.85, intereses: 3511000, dias: 138},
+            {num: 1715, fecha: '25/10/2025', vencimiento: '24/11/2025', valor: 39935992.50, intereses: 3496000, dias: 138},
+            {num: 1716, fecha: '24/11/2025', vencimiento: '24/11/2025', valor: 49104000, intereses: 3370000, dias: 108},
+            {num: 1717, fecha: '24/11/2025', vencimiento: '24/12/2025', valor: 18436500, intereses: 1265000, dias: 108},
+            {num: 1718, fecha: '24/11/2025', vencimiento: '24/12/2025', valor: 29353500, intereses: 2013000, dias: 108},
+            {num: 1719, fecha: '24/11/2025', vencimiento: '24/12/2025', valor: 31383000, intereses: 2153000, dias: 108},
+            {num: 1720, fecha: '24/11/2025', vencimiento: '24/12/2025', valor: 2254500, intereses: 154000, dias: 108},
+            {num: 1723, fecha: '25/11/2025', vencimiento: '24/12/2025', valor: 46590750, intereses: 3168000, dias: 107},
+            {num: 1725, fecha: '25/11/2025', vencimiento: '25/12/2025', valor: 35955000, intereses: 2445000, dias: 107},
+            {num: 1728, fecha: '25/11/2025', vencimiento: '25/12/2025', valor: 17784000, intereses: 1210000, dias: 107},
+            {num: 1731, fecha: '25/11/2025', vencimiento: '25/12/2025', valor: 4356000, intereses: 297000, dias: 107},
+            {num: 1732, fecha: '25/11/2025', vencimiento: '25/12/2025', valor: 7978500, intereses: 542000, dias: 107},
+            {num: 1733, fecha: '25/11/2025', vencimiento: '25/12/2025', valor: 3465000, intereses: 236000, dias: 107},
+            {num: 1734, fecha: '25/11/2025', vencimiento: '25/12/2025', valor: 594000, intereses: 41000, dias: 107},
+            {num: 1735, fecha: '25/11/2025', vencimiento: '25/12/2025', valor: 594000, intereses: 41000, dias: 107},
+            {num: 1736, fecha: '25/11/2025', vencimiento: '25/12/2025', valor: 594000, intereses: 41000, dias: 107},
+            {num: 1737, fecha: '25/11/2025', vencimiento: '25/12/2025', valor: 990000, intereses: 61000, dias: 107}
+        ];
+
+        const bucketName = 'facturas-fh';
+        let allBucketFiles = []; // Cache de archivos del bucket
+
+        // Cargar lista de archivos del bucket una sola vez
+        async function loadBucketFiles() {
+            try {
+                const url = `https://www.googleapis.com/storage/v1/b/${bucketName}/o?maxResults=1000`;
+                const response = await fetch(url);
+                const data = await response.json();
+                allBucketFiles = data.items || [];
+                console.log('Archivos cargados del bucket:', allBucketFiles.length);
+            } catch (error) {
+                console.error('Error cargando archivos del bucket:', error);
+            }
+        }
+
+        // Obtener archivos de una factura específica
+        function getFacturaFiles(facturaNum) {
+            const prefix = `FACTURA ${facturaNum}/`;
+            return allBucketFiles
+                .filter(item => item.name.startsWith(prefix))
+                .map(item => item.name.split('/').pop());
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('es-CO', {
+                style: 'currency',
+                currency: 'COP',
+                minimumFractionDigits: 0
+            }).format(value);
+        }
+
+        function calcularDiasVencida(fechaVencimiento) {
+            const [dia, mes, anio] = fechaVencimiento.split('/').map(Number);
+            const fecha = new Date(anio, mes - 1, dia);
+            const hoy = new Date();
+            const diferencia = hoy - fecha;
+            const dias = Math.floor(diferencia / (1000 * 60 * 60 * 24));
+            return dias > 0 ? dias : 0;
+        }
+
+        function renderTable(filteredFacturas = facturas) {
+            const tbody = document.getElementById('tableBody');
+            const noResults = document.getElementById('noResults');
+            const resultsCount = document.getElementById('resultsCount');
+
+            tbody.innerHTML = '';
+
+            if (filteredFacturas.length === 0) {
+                noResults.classList.remove('hidden');
+                resultsCount.textContent = 'No se encontraron resultados';
+                return;
+            }
+
+            noResults.classList.add('hidden');
+            resultsCount.textContent = `Mostrando ${filteredFacturas.length} de ${facturas.length} facturas`;
+
+            filteredFacturas.forEach((factura, index) => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td class="factura-num">${factura.num}</td>
+                    <td>${factura.fecha}</td>
+                    <td>${factura.vencimiento}</td>
+                    <td class="valor">${formatCurrency(factura.valor)}</td>
+                    <td class="valor">${formatCurrency(factura.intereses)}</td>
+                    <td>${factura.dias} días</td>
+                    <td>
+                        <div class="download-cell">
+                            ${createDownloadLinks(factura.num)}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function createDownloadLinks(facturaNum) {
+            const files = getFacturaFiles(facturaNum);
+            
+            if (files.length === 0) {
+                return '<span class="loading">Sin archivos</span>';
+            }
+            
+            let html = '';
+            files.forEach(fileName => {
+                const downloadUrl = `https://storage.googleapis.com/${bucketName}/FACTURA%20${facturaNum}/${encodeURIComponent(fileName)}`;
+                
+                html += `<a href="${downloadUrl}" target="_blank" class="download-btn" title="${fileName}"><span>📥</span><span class="file-label">${fileName}</span></a>`;
+            });
+            
+            return html;
+        }
+
+        function filterFacturas(searchTerm) {
+            const term = searchTerm.toLowerCase().trim();
+            
+            if (!term) {
+                renderTable(facturas);
+                return;
+            }
+
+            const filtered = facturas.filter(factura => 
+                factura.num.toString().includes(term) ||
+                factura.fecha.includes(term) ||
+                factura.vencimiento.includes(term) ||
+                formatCurrency(factura.valor).toLowerCase().includes(term)
+            );
+
+            renderTable(filtered);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            filterFacturas(e.target.value);
+        });
+
+        // Cargar archivos del bucket y luego renderizar tabla
+        loadBucketFiles().then(() => {
+            renderTable();
+        });
+    </script>
+</body>
+</html>
